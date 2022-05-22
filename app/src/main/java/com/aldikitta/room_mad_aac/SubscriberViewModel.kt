@@ -2,12 +2,17 @@ package com.aldikitta.room_mad_aac
 
 import androidx.lifecycle.*
 import com.aldikitta.room_mad_aac.database.Subscriber
+import com.aldikitta.room_mad_aac.database.SubscriberDAO
 import com.aldikitta.room_mad_aac.database.SubscriberRepository
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class SubscriberViewModel(private val repository: SubscriberRepository) : ViewModel() {
     val subscribers = repository.subscribers
+
+    private var isUpdateOrDelete = false
+
+    private lateinit var subscriberToUpdateOrDelete: Subscriber
 
     val inputName = MutableLiveData<String?>()
 
@@ -28,15 +33,25 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
     }
 
     fun saveOrUpdate() {
-        val name = inputName.value!!
-        val email = inputEmail.value!!
-        insert(Subscriber(0, name, email))
-        inputName.value = null
-        inputEmail.value = null
+        if(isUpdateOrDelete){
+            subscriberToUpdateOrDelete.name = inputName.value!!
+            subscriberToUpdateOrDelete.email = inputEmail.value!!
+            update(subscriberToUpdateOrDelete)
+        }else{
+            val name = inputName.value!!
+            val email = inputEmail.value!!
+            insert(Subscriber(0, name, email))
+            inputName.value = null
+            inputEmail.value = null
+        }
     }
 
     fun clearAllOrDelete() {
-        clearAll()
+        if(isUpdateOrDelete){
+            delete(subscriberToUpdateOrDelete)
+        }else{
+            clearAll()
+        }
     }
 
     fun insert(subscriber: Subscriber) {
@@ -48,12 +63,22 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
     fun update(subscriber: Subscriber) {
         viewModelScope.launch {
             repository.update(subscriber)
+            inputName.value = null
+            inputEmail.value = null
+            isUpdateOrDelete = false
+            saveOrUpdateButtonText.value = "Save"
+            clearAllOrDeleteButtonText.value = "Clear All"
         }
     }
 
     fun delete(subscriber: Subscriber) {
         viewModelScope.launch {
             repository.delete(subscriber)
+            inputName.value = null
+            inputEmail.value = null
+            isUpdateOrDelete = false
+            saveOrUpdateButtonText.value = "Save"
+            clearAllOrDeleteButtonText.value = "Clear All"
         }
     }
 
@@ -61,6 +86,15 @@ class SubscriberViewModel(private val repository: SubscriberRepository) : ViewMo
         viewModelScope.launch {
             repository.deleteAll()
         }
+    }
+
+    fun initUpdateAndDelete(subscriber: Subscriber){
+        inputName.value = subscriber.name
+        inputEmail.value = subscriber.email
+        isUpdateOrDelete = true
+        subscriberToUpdateOrDelete = subscriber
+        saveOrUpdateButtonText.value = "Update"
+        clearAllOrDeleteButtonText.value = "Delete"
     }
 
     fun getSaveSubscribers() = liveData {
