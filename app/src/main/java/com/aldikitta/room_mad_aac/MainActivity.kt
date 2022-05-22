@@ -29,18 +29,21 @@ class MainActivity : AppCompatActivity() {
         initRecyclerView()
     }
 
-    private fun initRecyclerView(){
+    private fun initRecyclerView() {
         binding.subscriberRecyclerView.layoutManager = LinearLayoutManager(this)
         displaySubscribersList()
     }
 
-    private fun displaySubscribersList(){
+    private fun displaySubscribersList() {
         subscriberViewModel.getSaveSubscribers().observe(this, Observer {
             Log.i("MYTAG", it.toString())
-            binding.subscriberRecyclerView.adapter = RecyclerViewAdapter(it)
+            binding.subscriberRecyclerView.adapter = RecyclerViewAdapter(
+                it
+            ) { selectedItem: Subscriber -> listItemClicked(selectedItem) }
         })
     }
-    private fun listItemClicked(subscriber: Subscriber){
+
+    private fun listItemClicked(subscriber: Subscriber) {
         Toast.makeText(this, "Selected name is ${subscriber.name}", Toast.LENGTH_LONG).show()
     }
 }
