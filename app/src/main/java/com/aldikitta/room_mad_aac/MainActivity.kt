@@ -16,6 +16,7 @@ import com.aldikitta.room_mad_aac.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var subscriberViewModel: SubscriberViewModel
+    private lateinit var adapter: RecyclerViewAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -27,24 +28,31 @@ class MainActivity : AppCompatActivity() {
         binding.myViewModel = subscriberViewModel
         binding.lifecycleOwner = this
         initRecyclerView()
+
+        subscriberViewModel.message.observe(this, Observer {
+            it.getContentIfNotHandled()?.let {
+                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+            }
+        })
     }
 
     private fun initRecyclerView() {
         binding.subscriberRecyclerView.layoutManager = LinearLayoutManager(this)
-        displaySubscribersList()
+        adapter = RecyclerViewAdapter { selectedItem: Subscriber -> listItemClicked(selectedItem) }
+        binding.subscriberRecyclerView.adapter = adapter
+            displaySubscribersList()
     }
 
     private fun displaySubscribersList() {
         subscriberViewModel.getSaveSubscribers().observe(this, Observer {
             Log.i("MYTAG", it.toString())
-            binding.subscriberRecyclerView.adapter = RecyclerViewAdapter(
-                it
-            ) { selectedItem: Subscriber -> listItemClicked(selectedItem) }
+            adapter.setList(it)
+            adapter.notifyDataSetChanged()
         })
     }
 
     private fun listItemClicked(subscriber: Subscriber) {
-        Toast.makeText(this, "Selected name is ${subscriber.name}", Toast.LENGTH_LONG).show()
+//        Toast.makeText(this, "Selected name is ${subscriber.name}", Toast.LENGTH_LONG).show()
         subscriberViewModel.initUpdateAndDelete(subscriber)
     }
 }

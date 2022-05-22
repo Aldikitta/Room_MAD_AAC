@@ -10,10 +10,12 @@ import com.aldikitta.room_mad_aac.databinding.ListItemBinding
 import com.aldikitta.room_mad_aac.generated.callback.OnClickListener
 
 class RecyclerViewAdapter(
-    private val subscribersList: List<Subscriber>,
     private val clickListener: (Subscriber) -> Unit
 ) :
     RecyclerView.Adapter<MyViewHolder>() {
+
+    private val subscribersList = ArrayList<Subscriber>()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding: ListItemBinding =
@@ -23,6 +25,11 @@ class RecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         holder.bind(subscribersList[position], clickListener)
+    }
+
+    fun setList(subscribers: List<Subscriber>){
+        subscribersList.clear()
+        subscribersList.addAll(subscribers)
     }
 
     override fun getItemCount(): Int {
