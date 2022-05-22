@@ -3,7 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/aldik/Documents/Room_MAD_AAC/app/src/main/res/drawable/shadow_background.xml" value="0.118" />
         <entry key="..\:/Users/aldik/Documents/Room_MAD_AAC/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/aldik/Documents/Room_MAD_AAC/app/src/main/res/layout/list_item.xml" value="0.19882246376811594" />
       </map>
     </option>
   </component>
